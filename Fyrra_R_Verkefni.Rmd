@@ -1,0 +1,79 @@
+---
+title: "Fyrra R Verkefni"
+author: "Nouvan Shebubakar (mns2@hi.is"
+date: "2023-02-01"
+output: html_document
+---
+
+```{r, warning = FALSE, message = FALSE}
+library(tidyverse)
+library(forcats)
+library(knitr)
+```
+
+## Hluti 1 Gagnamöndl
+# a) Lesa gagnasafnid inn i R
+```{r}
+n <- read.table("https://notendur.hi.is/~ahj/husnaedisverd_2017_21.csv", header = TRUE, sep=";", stringsAsFactors = T, encoding = "UTF-8")
+```
+
+# b) 3 Hverfi
+```{r}
+hverfi <- c(300,320,330)
+n <- filter(n, matssvaedi%in%hverfi)
+```
+
+# c) Checking the type of all variables in n
+```{r}
+str(n)
+```
+
+# d) Nyja breyta kalla fermetraverd
+```{r}
+n <- mutate(n, fermetraverd = kaupverd / birtm2)
+```
+
+# e) Nyja breyta teg_eign_s_i
+```{r}
+n <- mutate(n, teg_eign_s_i = fct_recode(teg_eign, Sérbýli = "Einbýlishús", Sérbýli = "Parhús", Sérbýli = "Raðhús", Íbúð = "Íbúðareign"))
+```
+
+# f)
+```{r}
+n <- mutate(n, matssvaedi = factor(matssvaedi))
+levels(n$matssvaedi) <- c("Kóp-Vesturbær", "Kóp-Austurbær", "Kóp-Hjallar,Smárar")
+```
+
+## Hluti 2 - Myndræn framsetning
+# g)
+```{r}
+ggplot(n, aes(x = kaupverd)) + geom_histogram(bins = 18, color = "#000000", fill = "#0099F8") + labs(title = "Histogram of Housing Price")+ theme_classic() + theme(axis.text.x = element_text(angle = 90), plot.title = element_text(color = "#0099F8", size = 16, face = "bold"))+ scale_x_continuous(breaks = seq(5000,130000, by = 5000))
+
+ggplot(n, aes(x = birtm2)) + geom_histogram(bins = 23, color = "#000000", fill = "#0099F8") + labs(title = "Histogram of Housing Size",x = "Fermetrar") + theme_classic() + theme(axis.text.x = element_text(angle = 90), plot.title = element_text(color = "#0099F8", size = 16, face = "bold")) + scale_x_continuous(breaks = seq(25,450, by = 25))
+```
+# h)
+```{r}
+df <- na.omit(n[, c("matssvaedi", "teg_eign_s_i")])
+counts <- df %>%
+  group_by(matssvaedi, teg_eign_s_i)%>%
+  summarise(count = n(), .groups = 'drop')
+df1 <- ggplot(counts, aes(x = matssvaedi, y = count))
+df1 + geom_col(aes(fill = teg_eign_s_i), position = 'dodge') + geom_text(aes(label = count, group = teg_eign_s_i), position = position_dodge(width = 0.9), color="black", vjust = 0.01, size = 3) + scale_fill_brewer(palette = "Paired") + theme_classic()
+```
+
+# i) 
+```{r}
+ggplot(n, aes(x = teg_eign_s_i, y = fermetraverd)) + geom_boxplot()
+```
+
+# j)
+```{r}
+ggplot(n, aes(x = birtm2, y = kaupverd, color = teg_eign_s_i)) + geom_point() + facet_grid(~matssvaedi) + xlab("Birtm2") + ylab("Kaupverð") + theme(axis.text.x = element_text(angle = 90))
+```
+
+## Hluti 3
+# k) 
+
+
+
+
